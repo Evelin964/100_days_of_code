@@ -75,8 +75,8 @@ class CoffeeMachine:
         for resource, quantity_required in self.coffee_options[choice][
             "ingredients"
         ].items():
-
-            return self.resources[resource] - quantity_required
+            self.resources[resource] = self.resources[resource] - quantity_required
+        return self.resources[resource]
 
     def money_inserted(self) -> int:
         # returneaza coins pe care le-ai bagat in aparat
@@ -110,9 +110,7 @@ cafea = CoffeeMachine(coffee_options=coffee_data, resources=initial_resources)
 # check_resursa = cafea.check_resources(choice="latte")
 cafea.report()
 
-fa_cafea = cafea.making_coffee(choice="latte", coffee_options=coffee_data)
-
-print(fa_cafea)
+fa_cafea = cafea.making_coffee(choice="latte")
 
 cafea.report()
 # print(coins_check)
