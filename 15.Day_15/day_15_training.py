@@ -16,9 +16,11 @@ class CoffeeMachine:
         self.resources = resources
         self.coffee_options = coffee_options
         self.coins = coins
-        self.flag_check_coins = None
         self.choice = None
         self.offerings = None
+        ## aici help pls
+        self.resource = None
+        self.quantity_required = None
 
     def your_coffee_choices(self) -> None:
         """Asks you for what would you like to drink."""
@@ -37,6 +39,7 @@ class CoffeeMachine:
                 for coffee in self.coffee_options.keys()
             ]
         )
+        print(self.offerings)
 
     def turning_off(self):
         """Exists the program aka closes the machine."""
@@ -52,25 +55,25 @@ class CoffeeMachine:
         """
         if self.choice not in self.coffee_options:
             print("Invalid Choice. Please choose from the available options.")
+            return False
         else:
-            for resource, quantity_required in self.coffee_options[self.choice][
-                "ingredients"
-            ].items():
-                if quantity_required > self.resources.get(resource, 0):
-                    print(f"Insufficient {resource}. Cannot make {self.choice}")
-                    return False
+            for self.resource, self.quantity_required in self.coffee_options[
+                self.choice
+            ]["ingredients"].items():
+                if self.quantity_required > self.resources.get(self.resource, 0):
+                    print(f"Insufficient {self.resource}. Cannot make {self.choice}")
                 else:
                     return True
 
-    def check_coins(self):
+    def check_coins(self) -> bool:
         return self.coffee_options[self.choice]["cost"] > self.coins
 
-    def making_coffee(self, choice: str) -> dict:
+    def making_coffee(self) -> dict:
         """Makes the actual coffee.
         Args:
             choice (str): Takes in your choice and makes your coffee
         """
-        for resource, quantity_required in self.coffee_options[choice][
+        for resource, quantity_required in self.coffee_options[self.choice][
             "ingredients"
         ].items():
             self.resources[resource] = self.resources[resource] - quantity_required
@@ -95,19 +98,51 @@ class CoffeeMachine:
         penni = float(input("Please input how many pennies (1 cents): "))
         self.coins = quarters * 0.25 + dimes * 0.10 + nickel * 0.05 + penni * 0.01
 
+    def coffee_brain(self):
+        """This is the main brain calling all methods and does all the doing."""
+        while True:
 
-cafea = CoffeeMachine(coffee_options=coffee_data, resources=initial_resources)
+            if self.coins == 0:
+                self.coffee_offerings()
+                self.your_coffee_choices()
+                if self.choice == "off":
+                    self.turning_off()
+                elif self.choice == "report":
+                    self.report()
+                    self.turning_off()
+                self.money_inserted()
 
-# resursa = cafea.making_coffee(choice="latte")
-# coins_inserted = cafea.money_inserted()
-# coins_check = cafea.check_coins(choice="latte", coins=coins_inserted)
+                if self.check_resources() is True:
+                    self.making_coffee()
 
-# check_resursa = cafea.check_resources(choice="latte")
-cafea.report()
-ce_bei = cafea.your_coffee_choices()
+                    print(
+                        f"Here is your {self.choice}☕😊 Enjoy! You have {self.coins} left."
+                    )
+                    self.coins -= self.coffee_options[self.choice]["cost"]
+                ### aici nu printeazza
+            elif self.coins > 0:
+                self.coffee_offerings()
+                self.your_coffee_choices()
+                if self.choice == "off":
+                    self.turning_off()
+                elif self.choice == "report":
+                    self.report()
+                    self.turning_off()
 
-print(cafea.check_resources())
+                if self.check_resources() is True:
+                    self.making_coffee()
+                    print(
+                        f"Here is your {self.choice}☕😊 Enjoy! You have {self.coins} left."
+                    )
+                    self.coins -= self.coffee_options[self.choice]["cost"]
+                ### si aici la fel
 
-cafea.report()
-# print(coins_check)
-# print(coins_inserted)
+            elif self.choice == "off":
+                self.turning_off()
+            elif self.choice == "report":
+                self.report()
+
+
+cafea = CoffeeMachine(resources=initial_resources, coffee_options=coffee_data)
+
+cafea.coffee_brain()
