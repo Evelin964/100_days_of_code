@@ -24,8 +24,8 @@ coffee_data = {
     },
 }
 initial_resources = {
-    "coffee_beans": 50,  # Initial amount of coffee beans (in grams)
-    "milk": 200,  # Initial amount of milk (in milliliters)
+    "coffee_beans": 19,  # Initial amount of coffee beans (in grams)
+    "milk": 300,  # Initial amount of milk (in milliliters)
     "water": 100,  # Initial amount of water (in milliliters)
 }
 

@@ -18,8 +18,8 @@ class CoffeeMachine:
         self.coins = coins
         self.choice = None
         self.offerings = None
-        self.more_coffe = None
-        self.missing_resources = 0
+        self.more_coffee = None
+        self.coins_result = None
 
     def your_coffee_choices(self) -> None:
         """Asks you for what would you like to drink."""
@@ -46,39 +46,29 @@ class CoffeeMachine:
         sys.exit()
 
     def check_resources(self) -> bool:
-        """Checks for the resources based on your choice.
-        Args:
-            choice (str): Takes in your choice made in the prompt method.
-        Returns:
-            bool: Makes your coffee or not based on the resources.
-        """
+        """Checks for the resources based on your choice."""
         if self.choice not in self.coffee_options:
             print("Invalid Choice. Please choose from the available options.")
-            return False
-        missing_resources = []
-        for resource, quantity_required in self.coffee_options[self.choice][
-            "ingredients"
-        ].items():
-            if quantity_required > self.resources.get(resource, 0):
-                missing_resources.append(f"---{resource}--- is missing")
-                return False
-            else:
+            # daca choice nu e in optiuni iti zice ca da nu exista adica TRUE
+            return True
+        elif self.choice in self.coffee_options:
+            # daca choice in optiuni adica False
+            # face o lista si pune ce lipseste in ea
+            missing_resources = []
+            for resource, quantity_required in self.coffee_options[self.choice][
+                "ingredients"
+            ].items():
+                if quantity_required > self.resources.get(resource, 0):
+                    missing_resources.append(f"---{resource}--- is missing")
+            if len(missing_resources) > 0:
+                print("\n".join(missing_resources))
                 return True
+            else:
+                return False
 
-        unique_count = len(set(missing_resources))
-        self.missing_resources += unique_count
-
-        # print(self.missing_resources)
-        # print(missing_resources)
-        # print(self.choice)
-
-        if self.missing_resources:
-            print("\n".join(missing_resources))
-            return False
-        return True
-
-    def check_coins(self) -> bool:
-        return self.coffee_options[self.choice]["cost"] > self.coins
+    def check_coins(self):
+        self.coins_result = self.coffee_options[self.choice]["cost"] > self.coins
+        self.coins -= self.coffee_options[self.choice]["cost"]
 
     def making_coffee(self) -> dict:
         """Makes the actual coffee.
@@ -110,63 +100,68 @@ class CoffeeMachine:
         penni = float(input("Please input how many pennies (1 cents): "))
         self.coins = quarters * 0.25 + dimes * 0.10 + nickel * 0.05 + penni * 0.01
 
+    def check_enough_money_for_any_choice(self) -> bool:
+        """Checks if you have enough money for any choice in the offerings."""
+        for choice, details in self.coffee_options.items():
+            if details["cost"] >= self.coins:
+                print("You don't have enough money for any choice in the offerings.")
+                return True
+        return False
+
     def coffee_brain(self):
         """This is the main brain calling all methods and does all the doing."""
-        while True:
-            if self.coins == 0:
-                self.coffee_offerings()
-                self.your_coffee_choices()
-                if self.choice == "off":
-                    print(f"Here is your remaining coins back {self.coins:.2f}")
-                    self.turning_off()
-                elif self.choice == "report":
-                    self.report()
-                    # self.turning_off()
-                else:
-                    self.money_inserted()
-                    if self.check_resources() is True:
-                        self.making_coffee()
-                        print(
-                            f"Here is your {self.choice}☕😊 Enjoy! You have {self.coins:.2f} left."
-                        )
-                        self.coins -= self.coffee_options[self.choice]["cost"]
 
-            elif self.coins > 0:
+        ##----------------##
+        ## step by step
+        # step 1 - sa prezinte produsele
+        while self.coins == 0:
 
-                self.coffee_offerings()
-                self.your_coffee_choices()
-
-                if self.choice == "off":
-                    print(f"Here is your remaining coins back {self.coins:.2f}")
-                    self.turning_off()
-
-                elif self.choice == "report":
-                    self.report()
-
-                else:
-                    # self.money_inserted()
-                    if self.check_resources() is True:
-
-                        self.making_coffee()
-                        print(
-                            f"Here is your {self.choice}☕😊 Enjoy! You have {self.coins:.2f} left."
-                        )
-                        self.coins -= self.coffee_options[self.choice]["cost"]
-                        self.more_coffe = input(
-                            "Would you like more coffee?(yes | no): "
-                        ).lower()
-            elif self.choice == "off":
+            self.coffee_offerings()
+            # step 2 - sa te intrebe ce vrei
+            self.your_coffee_choices()
+            # step 3 - sa-ti ceara bani
+            self.money_inserted()
+            # step 4 - sa faca verificarile
+            self.check_coins()
+            # - iti zice TRUE ca costul e mai mare sau False cand e mai mic
+            if self.check_resources() is True:
+                print(
+                    f"Sorry we are missing some stuff here is your money back {self.coins}"
+                )
                 self.turning_off()
-            elif self.choice == "report":
-                self.report()
-            elif self.more_coffe == "yes" and self.check_coins() is True:
-                if self.missing_resources > 0:
-                    print("The machine is lacking resources!")
-                    print(f"We are sorry here is your money back {self.coins}")
-                    self.money_inserted()
-                else:
-                    print(f"Here is your remaining coins back {self.coins:.2f}")
-                    break
+            # - iti printeaza ce lipseste (TRUE) sau iti zice FALSE adica nu lipseste nimic
+            # step 5 - sa iti dea produsul
+            self.making_coffee()
+            print(f"Here is your {self.choice}. Enjoy! You have {self.coins} left!")
+            if self.check_resources() is True:
+                print("Sorry we are missing some stuff!")
+                self.turning_off()
+            self.more_coffee = input("Would you like more cofee (yes | no)").lower()
+            if self.more_coffee == "no":
+                self.turning_off()
+
+        # sau
+
+        while (
+            self.check_enough_money_for_any_choice() is False
+            and self.more_coffee == "yes"
+        ):
+            self.coffee_offerings()
+            self.your_coffee_choices()
+            self.check_coins()
+            if self.check_resources() is True:
+                print(
+                    f"Sorry we are missing some stuff here is your money back {self.coins}"
+                )
+                self.turning_off()
+            self.making_coffee()
+            print(f"Here is your {self.choice}. Enjoy! You have {self.coins} left!")
+            if self.check_resources() is True:
+                print("Sorry we are missing some stuff!")
+                self.turning_off()
+            self.more_coffee = input("Would you like more cofee (yes | no)").lower()
+            if self.check_enough_money_for_any_choice is True:
+                break
 
 
 cafea = CoffeeMachine(resources=initial_resources, coffee_options=coffee_data)
