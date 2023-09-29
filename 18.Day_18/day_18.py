@@ -54,7 +54,10 @@ canvas = turtle.getcanvas()
 canvas.postscript(file="output.eps", colormode="color")
 
 # Convert the PostScript file to a PNG image using Pillow
-img = Image.open("output.eps")
-img.save("output.png", "PNG")
+output_file_path = r"C:\Users\ediacon\OneDrive - MORNINGSTAR INC\Documents\Python Scripts\02.100 Days of Python\18.Day_18\output.png"
+img = ImageGrab.grab(bbox=turtle.getcanvas().winfo_rootx(), turtle.getcanvas().winfo_rooty(),
+                     turtle.getcanvas().winfo_width() + turtle.getcanvas().winfo_rootx(),
+                     turtle.getcanvas().winfo_height() + turtle.getcanvas().winfo_rooty())
+img.save(output_file_path)
 
 turtle.done()
