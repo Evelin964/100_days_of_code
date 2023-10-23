@@ -1,6 +1,5 @@
 from turtle import Turtle, Screen, onkeypress, listen, onkey
 import random
-import time
 
 
 # TODO 1: Create the screen - done
