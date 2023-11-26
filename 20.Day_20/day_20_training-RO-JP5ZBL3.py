@@ -1,0 +1,268 @@
+# TODO 1 Create the snake body
+# TODO 2 Move the snake
+# TODO 3 Create the snake food
+# TODO 4 Detect collision with food
+# TODO 5 Create a scoreboard
+# TODO 6 Detect collision with wall
+# TODO 7 Detect collision with tail
+
+
+# TODO 1 Create the snake body
+
+from turtle import Turtle, Screen
+import random
+import time
+
+# Food class to manage the food's appearance and position
+class Food(Turtle):
+    def __init__(self):
+        super().__init__()
+        self.shape("circle")
+        self.color("red")
+        self.penup()
+        self.shapesize(stretch_wid=0.8, stretch_len=0.8)
+        self.speed("fastest")
+        self.refresh()  # Initial placement of foody
+
+    def refresh(self):
+        x = random.randint(-280, 280)
+        y = random.randint(-280, 280)
+        self.goto(x, y)
+
+
+# SnakeGame class
+class SnakeGame:
+    def __init__(self):
+        self.initialize_game()
+        self.create_snake()
+        self.bind_keys()
+        self.game_over = False
+        self.paused = False
+        self.screen_update = True
+
+    def run_game(self):
+
+        while True:
+            if self.screen_update:
+                self.screen.update()
+            else:
+                break
+            if not self.paused:
+                self.collision_with_food()
+                for i in range(len(self.segments) - 1, 0, -1):
+                    x = self.segments[i - 1].xcor()
+                    y = self.segments[i - 1].ycor()
+                    self.segments[i].goto(x, y)
+                self.segments[0].forward(20)
+
+                if self.collision_with_wall() or self.collision_with_tail():
+                    self.toggle_pause()
+                    self.game_over = True
+                    self.play_again_prompt()
+
+            self.increase_speed()
+
+    def initialize_play_again(self):
+        self.play_again_turtle = Turtle()
+        self.play_again_turtle.penup()
+        self.play_again_turtle.hideturtle()
+        self.play_again_turtle.color("white")
+        self.play_again_turtle.goto(0, 0)
+
+    def end_game(self):
+        self.game_over = True
+        self.screen.bye()
+        self.screen_update = False
+
+    def play_again_prompt(self):
+        self.play_again_turtle.clear()
+
+        self.play_again_turtle.write(
+            "-----Game Over-----\nDo you want to play again? (Y|N)",
+            align="center",
+            font=("Arial", 24, "normal"),
+        )
+        self.screen.listen()
+
+        self.screen.onkey(self.restart_game, "y")
+        self.screen.onkey(self.end_game, "n")
+
+    def increase_speed(self):
+
+        if self.food_count < 7:
+            new_speed = 0.1 - (self.food_count * 0.01)
+        else:
+            new_speed = 0.03
+        time.sleep(new_speed)
+
+    def set_new_high_score(self, new_high_score):
+        self.update_high_score_file(new_high_score)
+        if self.game_over == True:
+            self.highest_score_turtle.clear()
+            self.display_highest_score()
+
+    def collision_with_food(self):
+        head = self.segments[0]
+        if head.distance(self.food) < 20:
+            self.food.refresh()
+            self.extend_snake()
+            self.food_count += 1
+            self.update_score()
+            if self.food_count * 10 > self.get_high_score_from_file():
+                self.set_new_high_score(self.food_count * 10)
+
+    def create_snake(self):
+        initial_positions = [(0, 0), (-20, 0), (-40, 0)]
+        for position in initial_positions:
+            new_segment = Turtle("square")
+            new_segment.color("white")
+            new_segment.penup()
+            new_segment.goto(position)
+            self.segments.append(new_segment)
+
+    def update_score(self):
+        self.score_turtle.clear()
+        score = self.food_count * 10
+        self.score_turtle.write(
+            f"Score: {score}", align="center", font=("Arial", 24, "normal")
+        )
+
+    def display_highest_score(self):
+        high_score = self.get_high_score_from_file()
+
+        self.highest_score_turtle.write(
+            f"High Score: {high_score}",
+            align="center",
+            font=("Arial", 24, "normal"),
+        )
+
+    def initialize_scoreboard(self):
+        self.score_turtle = Turtle()
+        self.score_turtle.penup()
+        self.score_turtle.hideturtle()
+        self.score_turtle.color("white")
+        self.score_turtle.goto(-200, 260)
+
+        self.highest_score_turtle = Turtle()
+        self.highest_score_turtle.penup()
+        self.highest_score_turtle.hideturtle()
+        self.highest_score_turtle.color("white")
+        self.highest_score_turtle.goto(160, 260)
+
+        self.display_highest_score()
+
+    def initialize_boundaries(self):
+        self.left_boundary = -290
+        self.right_boundary = 290
+        self.top_boundary = 290
+        self.bottom_boundary = -290
+
+    def initialize_game(self):
+        self.screen = Screen()
+        self.screen.setup(width=600, height=600)
+        self.screen.bgcolor("black")
+        self.screen.tracer(0)
+        self.screen.title("------My Snake Game------")
+
+        self.segments = []
+        self.food = Food()
+        self.food_count = 0
+        self.paused = False
+
+        self.initialize_boundaries()
+        self.initialize_scoreboard()
+        self.initialize_play_again()
+
+    def bind_keys(self):
+        if not self.paused:
+            self.screen.listen()
+            self.screen.onkeypress(self.move_up, "Up")
+            self.screen.onkeypress(self.move_down, "Down")
+            self.screen.onkeypress(self.move_left, "Left")
+            self.screen.onkeypress(self.move_right, "Right")
+            self.screen.onkeypress(self.toggle_pause, "space")
+        else:
+            self.screen.listen()
+            self.screen.onkeypress(None, "Up")
+            self.screen.onkeypress(None, "Down")
+            self.screen.onkeypress(None, "Left")
+            self.screen.onkeypress(None, "Right")
+            self.screen.onkeypress(self.toggle_pause, "space")
+
+    def restart_game(self):
+        self.game_over = False
+        for segment in self.segments:
+            segment.hideturtle()
+        self.segments.clear()
+
+        self.screen.clear()
+        self.initialize_game()
+        self.create_snake()
+        self.bind_keys()
+
+    def toggle_pause(self):
+        if not self.game_over:
+            self.paused = not self.paused
+            self.bind_keys()
+
+    def get_high_score_from_file(self):
+        file_path = r"C:\Users\ediacon\OneDrive - MORNINGSTAR INC\Documents\Python Scripts\02.100 Days of Python\20.Day_20\data.txt"
+
+        try:
+            with open(file_path, encoding="utf-8", mode="r") as file:
+                high_score = int(file.read())
+                return high_score
+        except (FileNotFoundError, ValueError):
+            return 0
+
+    def update_high_score_file(self, new_high_score):
+        file_path = r"C:\Users\ediacon\OneDrive - MORNINGSTAR INC\Documents\Python Scripts\02.100 Days of Python\20.Day_20\data.txt"
+
+        with open(file_path, encoding="utf-8", mode="w") as file:
+            file.write(str(new_high_score))
+
+    def move_up(self):
+        if self.segments[0].heading() != 270:
+            self.segments[0].setheading(90)
+
+    def move_down(self):
+        if self.segments[0].heading() != 90:
+            self.segments[0].setheading(270)
+
+    def move_left(self):
+        if self.segments[0].heading() != 0:
+            self.segments[0].setheading(180)
+
+    def move_right(self):
+        if self.segments[0].heading() != 180:
+            self.segments[0].setheading(0)
+
+    def extend_snake(self):
+        new_segment = Turtle("square")
+        new_segment.color("white")
+        new_segment.penup()
+        last_segment = self.segments[-1]
+        new_segment.goto(last_segment.xcor(), last_segment.ycor())
+        self.segments.append(new_segment)
+
+    def collision_with_tail(self):
+        head = self.segments[0]
+        for segment in self.segments[1:]:
+            if head.distance(segment) < 10:
+                return True
+        return False
+
+    def collision_with_wall(self):
+        head = self.segments[0]
+        return (
+            head.xcor() < self.left_boundary
+            or head.xcor() > self.right_boundary
+            or head.ycor() > self.top_boundary
+            or head.ycor() < self.bottom_boundary
+        )
+
+
+# Main game loop
+if __name__ == "__main__":
+    game = SnakeGame()
+    game.run_game()
