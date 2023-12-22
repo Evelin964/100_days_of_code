@@ -132,17 +132,30 @@ class PasswordManager(tk.Tk):
         website = self.website_entry.get()
         email = self.email_entry.get()
         password = self.password_entry.get()
-        
+
         if len(website) == 0 or len(password) == 0 or len(email) == 0:
             tk.messagebox.showinfo(title="Error!", message="Please don't leave any fields empty!")
         else:
-            is_ok = tk.messagebox.askokcancel(title=website, message=f"These are the details entered: \nEmail: {email} \nPassword: {password} \nIs it ok to save?")
-            if is_ok:
-                with open("29.Day_29/data.txt", mode="a") as file:
-                    file.write(f"{website} | {email} | {password}\n")
-                    self.website_entry.delete(0, tk.END)
-                    self.password_entry.delete(0, tk.END)
-                    self.website_entry.focus()
+            is_duplicate = self.check_duplicate_entry(website, email)
+            if is_duplicate:
+                tk.messagebox.showinfo(title="Duplicate Entry", message="This entry already exists!")
+            else:
+                is_ok = tk.messagebox.askokcancel(title=website, message=f"These are the details entered: \nEmail: {email} \nPassword: {password} \nIs it ok to save?")
+                if is_ok:
+                    with open("29.Day_29/data.txt", mode="a") as file:
+                        file.write(f"{website} | {email} | {password}\n")
+                        self.website_entry.delete(0, tk.END)
+                        self.password_entry.delete(0, tk.END)
+                        self.website_entry.focus()
+
+    def check_duplicate_entry(self, website, email):
+        with open("29.Day_29/data.txt", mode="r") as file:
+            data = file.readlines()
+            for line in data:
+                entry = line.split("|")
+                if website.lower() == entry[0].strip().lower() and email.lower() == entry[1].strip().lower():
+                    return True
+        return False
     
       
     def ui_setup(self):
