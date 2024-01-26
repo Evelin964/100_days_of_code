@@ -36,7 +36,6 @@ class PasswordManager(tk.Tk):
             return True
         return False
 
-
     def open_selection_window(self):
         self.selection_window = tk.Toplevel(self)
         self.selection_window.title("Select an Email")
@@ -78,7 +77,6 @@ class PasswordManager(tk.Tk):
         for entry in self.matching_entries:
             listbox.insert(tk.END, entry['email'])
 
-
     def on_select(self, evt):
         w = evt.widget
         index = int(w.curselection()[0])
@@ -87,22 +85,12 @@ class PasswordManager(tk.Tk):
         
         self.selection_window.destroy()
         
-
-
-
     def insert_matching_entry(self, entry):
         self.email_entry.delete(0, tk.END)
         self.password_entry.delete(0, tk.END)      
         self.email_entry.insert(0, entry["email"])
         self.password_entry.insert(0, entry["password"])
        
-
-
-
-
-
-
-
     def generate_password(self):
         characters = string.ascii_letters + string.digits + string.punctuation
         password = "".join(random.choice(characters) for _ in range(15))
@@ -110,8 +98,7 @@ class PasswordManager(tk.Tk):
         self.password_entry.insert(0, password)
     
     def lookup_entry(self):
-        if self.check_website_length():
-            
+        if self.check_website_length():  
             return
         self.check_email_match()
     
@@ -124,8 +111,6 @@ class PasswordManager(tk.Tk):
             self.process_matching_entries()
         else:
             tk.messagebox.showinfo(title="No Match Found", message="No entries found for the website.")
-
-
      
     def process_matching_entries(self):
         if len(self.matching_entries) == 1:
@@ -133,11 +118,6 @@ class PasswordManager(tk.Tk):
             tk.messagebox.showinfo(title="Match Found", message="Match found for the website.")
         elif len(self.matching_entries) > 1:
             self.open_selection_window()
-
-
-
-   
-        
 
     def add_entry(self):
         website = self.website_entry.get().strip()
@@ -170,7 +150,6 @@ class PasswordManager(tk.Tk):
         self.email_entry.insert(0, "oferteevelin1996.com")
         self.website_entry.focus()
 
-    
     def read_entries_from_file(self):
         try:
             with open("29.Day_29/data.json", mode="r") as file:
@@ -182,11 +161,7 @@ class PasswordManager(tk.Tk):
     def write_entries_to_file(self, data):
         with open("29.Day_29/data.json", mode="w") as file:
             json.dump(data, file,indent=4)
-
-       
-    
-    
-  
+      
     def ui_setup(self):
         self.title("Password Manager")
         self.resizable(False, False)
