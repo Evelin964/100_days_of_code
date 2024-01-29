@@ -21,8 +21,8 @@ def send_email(subject, body, to_email, is_html=False):
     Returns:
     None
     """
-    from_email = "oferteevelin1996@gmail.com"
-    from_password = 
+    from_email = ""
+    from_password = ""
     
     msg = MIMEMultipart()
     msg['From'] = from_email
