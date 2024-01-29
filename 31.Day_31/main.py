@@ -12,8 +12,6 @@ RIGHT_IMAGE_PATH = "31.Day_31/images/right.png"
 WRONG_IMAGE_PATH = "31.Day_31/images/wrong.png"
 
 
-# trb sa verific cum scoate cuvintele din self.data pentru ca  e posibil sa scoata cuv cu cuv si nu ambele  cuvinte
-
 
 class FlashCard():
     def __init__(self) -> None:
