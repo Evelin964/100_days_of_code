@@ -22,7 +22,7 @@ def send_email(subject, body, to_email, is_html=False):
     None
     """
     from_email = "oferteevelin1996@gmail.com"
-    from_password = "rzhc ppom jqtz nnhs"
+    from_password = 
     
     msg = MIMEMultipart()
     msg['From'] = from_email
