@@ -2,5 +2,6 @@
     "python.analysis.autoImportCompletions": false,
     "python.analysis.extraPaths": [
         "./32.Day_32"
-    ]
+    ],
+    "python.analysis.typeCheckingMode": "basic"
 }

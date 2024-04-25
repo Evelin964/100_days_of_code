@@ -1,5 +1,3 @@
-
-
 import tkinter as tk
 import pandas as pd
 import random
@@ -18,6 +16,7 @@ class FlashCard():
         self.ui_setup()
         self.read_data()
         
+        self.text_item = None
         self.card_face = "back"
         self.word_dict = {}
         self.is_running = False
