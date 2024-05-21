@@ -1,0 +1,15 @@
+img{width: 200px;
+height: 200px;}
+.color-title{font-weight: normal;
+padding: 10px;
+position: relative;
+top: 11px;}
+#red{color: red;
+font-family: Arial, Helvetica, sans-serif;
+font-size: 200%;}
+#blue{color: blue;;}
+#orange{color: orange;}
+#green{color: green;}
+#yellow{color: rgb(172, 172, 51);}
+#black{color: black;}
+.color-title{font-size: medium;}
