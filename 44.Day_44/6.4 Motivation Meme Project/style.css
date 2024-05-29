@@ -1,0 +1,21 @@
+body{background-color: black;
+justify-content: center;}
+h1{color: white;
+text-transform: uppercase;}
+p{  color: white;
+    font-size: 20px;
+}
+img{
+    width: 50%;
+    margin-top: 100px;
+border: 5px;
+border-color: white;
+border-style: solid;
+}
+.container{text-align: center;}
+.dog{width: 50%;
+    margin-top: 10px;
+    border: 12px;
+    border-color: rgb(171, 30, 30);
+    border-style: dashed;
+}
